@@ -37,10 +37,16 @@ describe('JWT Authentication', () => {
 		const decoded = verifyJwtToken(token);
 
 		expect(decoded).toHaveProperty('userId', 1);
+		expect(decoded).toHaveProperty('name', 'John Doe');
 	});
 
 	test('should throw an error for an invalid JWT token', () => {
 		expect(() => verifyJwtToken('invalid_token')).toThrow();
+	});
+
+	test('should throw an error when verifying a malformed token', () => {
+		const malformedToken = 'abc.def.ghi';
+		expect(() => verifyJwtToken(malformedToken)).toThrow();
 	});
 
 	test('should generate a new JWT token, given a valid JWT token', () => {
@@ -51,5 +57,18 @@ describe('JWT Authentication', () => {
 		expect(newToken).toBeDefined();
 		expect(typeof newToken).toBe('string');
 		expect(decoded).toHaveProperty('userId', 1);
+	});
+
+	test('should throw an error when trying to refresh an invalid token', () => {
+		expect(() => verifyAndGenerateToken('invalid_token', expiresIn)).toThrow(
+			'Cannot refresh token, verification failed!'
+		);
+	});
+
+	test('should fail to verify an expired token', async () => {
+		const shortLivedToken = generateJwtToken(mockPayload, 1);
+		await new Promise((resolve) => setTimeout(resolve, 2000));
+
+		expect(() => verifyJwtToken(shortLivedToken)).toThrow();
 	});
 });
