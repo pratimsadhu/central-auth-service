@@ -7,7 +7,13 @@
 		"strict": true,
 		"esModuleInterop": true,
 		"forceConsistentCasingInFileNames": true,
-		"skipLibCheck": true
+		"skipLibCheck": true,
+		"baseUrl": "./src",
+		"paths": {
+			"@config/*": ["config/*"],
+			"@utils/*": ["utils/*"],
+			"@services/*": ["services/*"]
+		}
 	},
 	"include": ["src"],
 	"exclude": ["node_modules", "dist"]
