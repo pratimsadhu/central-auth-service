@@ -29,3 +29,6 @@ out/
 # Dependencies lock files (optional)
 package-lock.json
 yarn.lock
+
+# Ignore Jest coverage reports
+coverage/
