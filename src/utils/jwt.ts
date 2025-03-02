@@ -1,6 +1,19 @@
+import { get } from 'http';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
-const secretKey = process.env.JWT_SECRET_KEY;
+/**
+ * Fetches the JWT secret key from the environment variables,
+ * and verifies it is set (not undefined)
+ * @returns The JWT secret key
+ */
+function getSecretKey(): string {
+	const secretKey = process.env.JWT_SECRET_KEY;
+
+	if (!secretKey) {
+		throw new Error('JWT Secret Key is not set!');
+	}
+	return secretKey;
+}
 
 /**
  * Generates a signed JWT token with the given payload and expiration time
@@ -9,9 +22,7 @@ const secretKey = process.env.JWT_SECRET_KEY;
  * @returns The signed JWT token string
  */
 export function generateJwtToken(payload: object, expiresIn: number): string {
-	if (!secretKey) {
-		throw new Error('JWT Secret Key is not set!');
-	}
+	const secretKey: string = getSecretKey();
 	return jwt.sign(payload, secretKey, { expiresIn: expiresIn });
 }
 
@@ -21,8 +32,6 @@ export function generateJwtToken(payload: object, expiresIn: number): string {
  * @returns The decoded payload of the JWT token
  */
 export function verifyJwtToken(token: string): JwtPayload | string {
-	if (!secretKey) {
-		throw new Error('JWT Secret Key is not set!');
-	}
+	const secretKey: string = getSecretKey();
 	return jwt.verify(token, secretKey);
 }
