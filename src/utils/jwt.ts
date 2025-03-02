@@ -53,7 +53,10 @@ export function verifyAndGenerateToken(
 ): string {
 	try {
 		const decoded = verifyJwtToken(token);
-		return generateJwtToken(decoded, expiresIn);
+
+		// Remove 'exp' field from decoded payload before generating a new token
+		const { exp, iat, ...payloadWithoutExp } = decoded;
+		return generateJwtToken(payloadWithoutExp, expiresIn);
 	} catch (error) {
 		throw new Error('Cannot refresh token, verification failed!');
 	}
