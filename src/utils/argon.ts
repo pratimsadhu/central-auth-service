@@ -1,4 +1,5 @@
 import argon2 from 'argon2';
+import argon2Config from '@config/argon';
 
 /**
  * Hashes a plain text password using Argon2
@@ -7,9 +8,27 @@ import argon2 from 'argon2';
  */
 export async function hashPassword(password: string): Promise<string> {
 	try {
-		const hashedPassword = await argon2.hash(password);
+		const hashedPassword = await argon2.hash(password, argon2Config);
 		return hashedPassword;
 	} catch (error) {
 		throw new Error('Error hashing password');
+	}
+}
+
+/**
+ * Verifies a plain text password against a hashed password
+ * @param hashedPassword The hashed password
+ * @param password The plain text password
+ * @returns A boolean indicating whether the password is valid
+ */
+export async function verifyPassword(
+	hashedPassword: string,
+	password: string
+): Promise<boolean> {
+	try {
+		const isPasswordValid = await argon2.verify(hashedPassword, password);
+		return isPasswordValid;
+	} catch (error) {
+		throw new Error('Error verifying password');
 	}
 }
