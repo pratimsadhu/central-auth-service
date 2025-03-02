@@ -1,4 +1,3 @@
-import { get } from 'http';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
 /**
@@ -33,11 +32,29 @@ export function generateJwtToken(payload: object, expiresIn: number): string {
  */
 export function verifyJwtToken(token: string): JwtPayload {
 	const secretKey: string = getSecretKey();
-	const decoded = jwt.verify(token, secretKey) as JwtPayload;
+	const decoded = jwt.verify(token, secretKey);
 
-	if (!decoded) {
-		throw new Error('Invalid Token');
+	if (!decoded || typeof decoded !== 'object') {
+		throw new Error('Invalid Token!');
 	}
 
-	return decoded;
+	return decoded as JwtPayload;
+}
+
+/**
+ * Verifies a JWT token and generates a new token with the same payload
+ * @param token The JWT to verify
+ * @param expiresIn The expiration time of the new token
+ * @returns The new JWT token
+ */
+export function verifyAndGenerateToken(
+	token: string,
+	expiresIn: number
+): string {
+	try {
+		const decoded = verifyJwtToken(token);
+		return generateJwtToken(decoded, expiresIn);
+	} catch (error) {
+		throw new Error('Cannot refresh token, verification failed!');
+	}
 }
