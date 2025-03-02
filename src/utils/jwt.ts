@@ -31,7 +31,13 @@ export function generateJwtToken(payload: object, expiresIn: number): string {
  * @param token The JWT token to verify
  * @returns The decoded payload of the JWT token
  */
-export function verifyJwtToken(token: string): JwtPayload | string {
+export function verifyJwtToken(token: string): JwtPayload {
 	const secretKey: string = getSecretKey();
-	return jwt.verify(token, secretKey);
+	const decoded = jwt.verify(token, secretKey) as JwtPayload;
+
+	if (!decoded) {
+		throw new Error('Invalid Token');
+	}
+
+	return decoded;
 }
