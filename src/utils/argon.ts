@@ -26,9 +26,9 @@ export async function verifyPassword(
 	password: string
 ): Promise<boolean> {
 	try {
-		const isPasswordValid = await argon2.verify(hashedPassword, password);
-		return isPasswordValid;
+		return await argon2.verify(hashedPassword, password);
 	} catch (error) {
-		throw new Error('Error verifying password!');
+		console.error('Password verification error:', error);
+		return false;
 	}
 }
