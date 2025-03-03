@@ -2,17 +2,32 @@ import supabaseClient from '@config/supabase';
 import { generateJwtToken } from '@utils/jwt';
 import { hashPassword, verifyPassword } from '@utils/argon';
 
+/**
+ * Generates an access token and a refresh token.
+ * @param payload The payload to sign the tokens with.
+ * @returns The access token and refresh token.
+ */
+function generateTokens(payload: object) {
+	const access_token = generateJwtToken(payload, 60 * 60); // 1 hour
+	const refresh_token = generateJwtToken(payload, 30 * 24 * 60 * 60); // 30 days
+
+	return { access_token, refresh_token };
+}
+
+/**
+ * The authentication service.
+ */
 const authService = {
 	/**
-	 * Signs up a user ensuring unique (email, clientId) pairs
-	 * @param email The email of the user to sign up
-	 * @param password The password of the user to sign up
-	 * @param clientId The unique ID of website the user is signing up for
-	 * @returns An object containing a message and status code
+	 * Signs up a user ensuring unique (email, clientId) pairs.
+	 * @param email The email of the user to sign up.
+	 * @param password The password of the user to sign up.
+	 * @param clientId The unique ID of the website the user is signing up for.
+	 * @returns An object containing a message and status code.
 	 */
 	signUp: async (email: string, password: string, clientId: string) => {
 		try {
-			// Check if the user with this email & clientId already exists
+			// Check if the user with this email & clientId already exists.
 			const { data: existingUser, error: findError } = await supabaseClient
 				.from('users')
 				.select('id')
@@ -20,11 +35,9 @@ const authService = {
 				.eq('client_id', clientId)
 				.maybeSingle();
 
-			if (findError) {
-				throw new Error(findError.message);
-			}
+			if (findError) throw new Error(findError.message);
 
-			// If user exists, return error
+			// If user exists, return error.
 			if (existingUser) {
 				return {
 					error: 'User with this email already exists for this client.',
@@ -32,40 +45,50 @@ const authService = {
 				};
 			}
 
-			// Hash the password
+			// Hash the password before storing.
 			const hashedPassword = await hashPassword(password);
 
 			const { data, error } = await supabaseClient
 				.from('users')
-				.upsert([
-					{
-						email: email,
-						password: hashedPassword,
-						client_id: clientId,
-					},
+				.insert([
+					{ email: email, password: hashedPassword, client_id: clientId },
 				])
 				.select('*')
 				.single();
 
-			if (error) {
-				throw new Error(error.message);
-			}
+			if (error) throw new Error(error.message);
 
-			return { message: 'Sign up successful', status: 200 };
+			const user = data;
+			const payload = {
+				user_id: user.id,
+				email: email,
+				client_id: clientId,
+			};
+
+			const { access_token, refresh_token } = generateTokens(payload);
+
+			return {
+				access_token,
+				refresh_token,
+				message: 'Sign up successful',
+				status: 201,
+			};
 		} catch (error: any) {
-			return { error: error.message || 'Internal Server Error', status: 500 };
+			console.error('Sign-up Error:', error);
+			return { error: 'Something went wrong. Please try again.', status: 500 };
 		}
 	},
 
 	/**
-	 * Signs in a user
-	 * @param email The email of the user to sign in
-	 * @param password The password of the user to sign in
-	 * @param clientId The unique ID of website the user is signing in for
-	 * @returns The token, refresh token, message, and status code
+	 * Signs in a user.
+	 * @param email The email of the user to sign in.
+	 * @param password The password of the user to sign in.
+	 * @param clientId The unique ID of the website the user is signing in for.
+	 * @returns The token, refresh token, message, and status code.
 	 */
 	signIn: async (email: string, password: string, clientId: string) => {
 		try {
+			// Fetch user with matching email and client_id.
 			const { data, error } = await supabaseClient
 				.from('users')
 				.select('*')
@@ -73,9 +96,7 @@ const authService = {
 				.eq('client_id', clientId)
 				.maybeSingle();
 
-			if (error) {
-				throw new Error(error.message);
-			}
+			if (error) throw new Error(error.message);
 
 			if (!data) {
 				return { error: 'User not found', status: 404 };
@@ -94,20 +115,17 @@ const authService = {
 				client_id: clientId,
 			};
 
-			const token = generateJwtToken(payload, 60 * 60);
-			const refreshToken = generateJwtToken(
-				{ ...payload, access_token: token },
-				30 * 24 * 60 * 60
-			);
+			const { access_token, refresh_token } = generateTokens(payload);
 
 			return {
-				token,
-				refreshToken,
+				access_token,
+				refresh_token,
 				message: 'Sign in successful',
 				status: 200,
 			};
 		} catch (error: any) {
-			return { error: error.message || 'Internal Server Error', status: 500 };
+			console.error('Sign-in Error:', error);
+			return { error: 'Something went wrong. Please try again.', status: 500 };
 		}
 	},
 };
