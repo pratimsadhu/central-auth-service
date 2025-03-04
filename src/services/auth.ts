@@ -186,6 +186,37 @@ const authService = {
 			return { error: 'Something went wrong. Please try again.', status: 500 };
 		}
 	},
+
+	/**
+	 * Deletes a user.
+	 * @param userId The ID of the user to delete.
+	 * @param clientId The unique ID of the website the user is deleting for.
+	 * @returns The message and status code.
+	 */
+	delete: async (userId: string, clientId: string) => {
+		try {
+			const { data, error } = await supabaseClient
+				.from('users')
+				.delete()
+				.eq('id', userId)
+				.single();
+
+			if (error) throw new Error(error.message);
+
+			if (!data) {
+				return { error: 'User not found', status: 404 };
+			}
+
+			return {
+				message: 'User deleted successfully',
+				status: 200,
+				action: 'Delete tokens from browser',
+			};
+		} catch (error) {
+			console.log('Error deleting user:', error);
+			return { error: 'Something went wrong. Please try again.', status: 500 };
+		}
+	},
 };
 
 export default authService;
