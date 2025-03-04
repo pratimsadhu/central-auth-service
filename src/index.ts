@@ -1,9 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import { ApolloServer } from 'apollo-server-express';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
 import typeDefs from '@graphql/schema';
 import resolvers from '@graphql/resolvers';
 
@@ -22,14 +21,15 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
-app.use(helmet());
-app.use(morgan('dev'));
 
 async function startApolloServer() {
-	const server = new ApolloServer({ typeDefs, resolvers });
+	const server = new ApolloServer({
+		typeDefs,
+		resolvers,
+	});
 
 	await server.start();
-	server.applyMiddleware({ app } as any);
+	app.use('/api', expressMiddleware(server));
 
 	app.get('/', (req, res) => {
 		res.json({
@@ -40,9 +40,7 @@ async function startApolloServer() {
 	// Start Server
 	app.listen(PORT, () => {
 		console.log(`Server running at http://localhost:${PORT}`);
-		console.log(
-			`GraphQL endpoint available at http://localhost:${PORT}${server.graphqlPath}`
-		);
+		console.log(`GraphQL API available at http://localhost:${PORT}/api`);
 	});
 }
 
