@@ -205,30 +205,47 @@ const authService = {
 	 * Deletes a user.
 	 * @param userId The ID of the user to delete.
 	 * @param clientId The unique ID of the website the user is deleting for.
+	 * @param token The token to verify the user with.
 	 * @returns The message and status code.
 	 */
-	delete: async (userId: string, clientId: string) => {
+	delete: async (userId: string, clientId: string, token: string) => {
 		try {
+			// Verify the token.
+			const decodedToken = verifyJwtToken(token);
+			if (
+				decodedToken.user_id !== userId ||
+				decodedToken.client_id !== clientId
+			) {
+				return { error: 'Unauthorized Request', status: 403 };
+			}
+
 			// Verify the client.
 			const clientVerification = await clientService.verifyClient(clientId);
 			if (clientVerification.error) return clientVerification;
 
-			const { data, error } = await supabaseClient
+			// Fetch user to ensure they exist before deleting
+			const { data: existingUser, error: findError } = await supabaseClient
+				.from('users')
+				.select('id')
+				.eq('id', userId)
+				.eq('client_id', clientId)
+				.maybeSingle();
+
+			if (findError) throw new Error(findError.message);
+			if (!existingUser) return { error: 'User not found', status: 404 };
+
+			// Delete the user from the database
+			const { error: deleteError } = await supabaseClient
 				.from('users')
 				.delete()
-				.eq('id', userId)
-				.single();
+				.eq('id', userId);
 
-			if (error) throw new Error(error.message);
-
-			if (!data) {
-				return { error: 'User not found', status: 404 };
-			}
+			if (deleteError) throw new Error(deleteError.message);
 
 			return {
 				message: 'User deleted successfully',
 				status: 200,
-				action: 'Delete tokens from browser',
+				action: 'Logout and clear tokens from browser',
 			};
 		} catch (error) {
 			console.log('Error deleting user:', error);
