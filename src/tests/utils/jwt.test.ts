@@ -16,6 +16,38 @@ describe('JWT Authentication', () => {
 		expect(typeof token).toBe('string');
 	});
 
+	test('should generate an access token and a refresh token', () => {
+		const { access_token, refresh_token } = generateTokens(mockPayload);
+
+		expect(access_token).toBeDefined();
+		expect(refresh_token).toBeDefined();
+		expect(typeof access_token).toBe('string');
+		expect(typeof refresh_token).toBe('string');
+	});
+
+	test('should generate an access token and a refresh token with custom expiration times', () => {
+		const { access_token, refresh_token } = generateTokens(
+			mockPayload,
+			60,
+			3600
+		);
+
+		const decodedAccessToken = verifyJwtToken(access_token);
+		const decodedRefreshToken = verifyJwtToken(refresh_token);
+		const accessExp = decodedAccessToken.exp;
+		const refreshExp = decodedRefreshToken.exp;
+
+		expect(decodedAccessToken).toHaveProperty('userId', 1);
+		expect(decodedRefreshToken).toHaveProperty('userId', 1);
+
+		expect(accessExp).toBeDefined();
+		expect(refreshExp).toBeDefined();
+
+		if (accessExp && refreshExp) {
+			expect(accessExp).toBeLessThan(refreshExp);
+		}
+	});
+
 	test('should verify a valid JWT token', () => {
 		const token = generateJwtToken(mockPayload, expiresIn);
 		const decoded = verifyJwtToken(token);
