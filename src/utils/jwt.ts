@@ -1,17 +1,21 @@
 import jwt, { JwtPayload } from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 /**
  * Fetches the JWT secret key from the environment variables,
  * and verifies it is set (not undefined)
  * @returns The JWT secret key
  */
-function getSecretKey(): string {
-	const secretKey = process.env.JWT_SECRET_KEY;
+function getPrivateKey(): string {
+	const privateKey = process.env.JWT_PRIVATE_KEY;
 
-	if (!secretKey) {
-		throw new Error('JWT Secret Key is not set!');
+	if (!privateKey) {
+		throw new Error('JWT Private Key is not set!');
 	}
-	return secretKey;
+	return privateKey.replace(/\\n/g, '\n');
 }
 
 /**
@@ -21,8 +25,11 @@ function getSecretKey(): string {
  * @returns The signed JWT token string
  */
 export function generateJwtToken(payload: object, expiresIn: number): string {
-	const secretKey: string = getSecretKey();
-	return jwt.sign(payload, secretKey, { expiresIn: expiresIn });
+	const secretKey: string = getPrivateKey();
+	return jwt.sign(payload, secretKey, {
+		algorithm: 'RS256',
+		expiresIn: expiresIn,
+	});
 }
 
 /**
@@ -31,8 +38,8 @@ export function generateJwtToken(payload: object, expiresIn: number): string {
  * @returns The decoded payload of the JWT token
  */
 export function verifyJwtToken(token: string): JwtPayload {
-	const secretKey: string = getSecretKey();
-	const decoded = jwt.verify(token, secretKey);
+	const secretKey: string = getPrivateKey();
+	const decoded = jwt.verify(token, secretKey, { algorithms: ['RS256'] });
 
 	if (!decoded || typeof decoded !== 'object') {
 		throw new Error('Invalid Token!');
