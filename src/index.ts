@@ -1,7 +1,8 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { ApolloServer } from '@apollo/server';
+// import { ApolloServer } from '@apollo/server';
+import { ApolloServer } from 'apollo-server-express';
 import { expressMiddleware } from '@apollo/server/express4';
 import typeDefs from '@graphql/schema';
 import resolvers from '@graphql/resolvers';
@@ -29,7 +30,8 @@ async function startApolloServer() {
 	});
 
 	await server.start();
-	app.use('/api', expressMiddleware(server));
+	server.applyMiddleware({ app: app as any, path: '/api' });
+	// app.use('/api', expressMiddleware(server));
 
 	app.get('/', (req, res) => {
 		res.json({
