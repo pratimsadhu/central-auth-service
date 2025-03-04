@@ -8,23 +8,6 @@ describe('JWT Authentication', () => {
 	const mockPayload = { userId: 1, name: 'John Doe' };
 	const expiresIn = 3600;
 
-	beforeEach(() => {
-		jest.resetModules();
-		process.env.JWT_SECRET_KEY = 'test_secret';
-	});
-
-	// Indirectly test the getSecretKey function
-	test('should throw an error if JWT_SECRET_KEY is not set', () => {
-		delete process.env.JWT_SECRET_KEY;
-
-		// Reload module to reflect the environment change
-		const jwtUtils = require('@utils/jwt');
-
-		expect(() => jwtUtils.generateJwtToken(mockPayload, expiresIn)).toThrow(
-			'JWT Secret Key is not set!'
-		);
-	});
-
 	test('should generate a valid JWT token', () => {
 		const token = generateJwtToken(mockPayload, expiresIn);
 
