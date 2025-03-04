@@ -1,5 +1,5 @@
 import authService from '@services/auth';
-import { verifyJwtToken, verifyAndGenerateToken } from '@utils/jwt';
+import { verifyJwtToken, verifyAndGenerateToken, generateJwtToken } from '@utils/jwt';
 
 const resolvers = {
 	Query: {
@@ -8,6 +8,12 @@ const resolvers = {
 		},
 		generateRefreshToken: async (_: any, { token }: { token: string }) => {
 			return verifyAndGenerateToken(token, 30 * 24 * 60 * 60);
+		},
+		sayHello: async (_: any) => {
+			return { message: 'Hello, World!', status: 200 };
+		},
+		generateToken: async (_: any) => {
+			return generateJwtToken({ id: '123' }, 60 * 60); 
 		},
 	},
 

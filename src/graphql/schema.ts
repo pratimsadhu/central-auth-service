@@ -16,9 +16,16 @@ const typeDefs = gql`
 		password: String
 	}
 
+	type Response {
+		message: String!
+		status: Int!
+	}
+
 	type Query {
 		verifyToken(token: String!): User
 		generateRefreshToken(token: String!): String
+		sayHello: Response
+		generateToken: String
 	}
 
 	type Mutation {
