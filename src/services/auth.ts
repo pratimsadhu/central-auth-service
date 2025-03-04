@@ -128,6 +128,63 @@ const authService = {
 			return { error: 'Something went wrong. Please try again.', status: 500 };
 		}
 	},
+
+	/**
+	 * Updates a user.
+	 * @param userId The ID of the user to update.
+	 * @param clientId The unique ID of the website the user is updating for.
+	 * @param updatedData The data to update the user with.
+	 * @returns The token, refresh token, message, and status code.
+	 */
+	update: async (
+		userId: string,
+		clientId: string,
+		updatedData: { email: string; password: string }
+	) => {
+		try {
+			const { data, error } = await supabaseClient
+				.from('users')
+				.select('*')
+				.eq('id', userId)
+				.eq('client_id', clientId)
+				.maybeSingle();
+
+			if (error) throw new Error(error.message);
+
+			if (!data) {
+				return { error: 'User not found', status: 404 };
+			}
+
+			const { email, password } = updatedData;
+			const hashedPassword = await hashPassword(password);
+
+			const { error: updateError } = await supabaseClient
+				.from('users')
+				.update({ email: email, password: hashedPassword })
+				.eq('id', userId)
+				.maybeSingle();
+
+			if (updateError) throw new Error(updateError.message);
+
+			const user = data;
+			const payload = {
+				user_id: user.id,
+				client_id: clientId,
+			};
+
+			const { access_token, refresh_token } = generateTokens(payload);
+
+			return {
+				access_token,
+				refresh_token,
+				message: 'User updated successfully',
+				status: 200,
+			};
+		} catch (error) {
+			console.log('Error updating user:', error);
+			return { error: 'Something went wrong. Please try again.', status: 500 };
+		}
+	},
 };
 
 export default authService;
