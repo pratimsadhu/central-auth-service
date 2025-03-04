@@ -1,5 +1,5 @@
 import supabaseClient from '@config/supabase';
-import { generateTokens } from '@utils/jwt';
+import { generateTokens, verifyJwtToken } from '@utils/jwt';
 import { hashPassword, verifyPassword } from '@utils/argon';
 import clientService from '@services/client';
 
@@ -130,15 +130,26 @@ const authService = {
 	 * Updates a user.
 	 * @param userId The ID of the user to update.
 	 * @param clientId The unique ID of the website the user is updating for.
+	 * @param token The token to verify the user with.
 	 * @param updatedData The data to update the user with.
 	 * @returns The token, refresh token, message, and status code.
 	 */
 	update: async (
 		userId: string,
 		clientId: string,
-		updatedData: { email: string; password: string }
+		token: string,
+		updatedData: { email?: string; password?: string }
 	) => {
 		try {
+			// Verify the token.
+			const decodedToken = verifyJwtToken(token);
+			if (
+				decodedToken.user_id !== userId ||
+				decodedToken.client_id !== clientId
+			) {
+				return { error: 'Unauthorized Request', status: 403 };
+			}
+
 			// Verify the client.
 			const clientVerification = await clientService.verifyClient(clientId);
 			if (clientVerification.error) return clientVerification;
@@ -152,26 +163,27 @@ const authService = {
 				.maybeSingle();
 
 			if (error) throw new Error(error.message);
+			if (!data) return { error: 'User not found', status: 404 };
 
-			if (!data) {
-				return { error: 'User not found', status: 404 };
+			// Prepare the updated data
+			const updateFields: { email?: string; password?: string } = {};
+			if (updatedData.email) {
+				updateFields.email = updatedData.email;
+			}
+			if (updatedData.password) {
+				updateFields.password = await hashPassword(updatedData.password);
 			}
 
-			const { email, password } = updatedData;
-			const hashedPassword = await hashPassword(password);
-
+			// Update user record
 			const { error: updateError } = await supabaseClient
 				.from('users')
-				.update({ email: email, password: hashedPassword })
-				.eq('id', userId)
-				.maybeSingle();
+				.update(updateFields)
+				.eq('id', userId);
 
 			if (updateError) throw new Error(updateError.message);
-
-			const user = data;
 			const payload = {
-				user_id: user.id,
-				email: email,
+				user_id: userId,
+				email: updatedData.email || data.email,
 				client_id: clientId,
 			};
 
