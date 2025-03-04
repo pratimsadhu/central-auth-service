@@ -25,8 +25,8 @@ function getPrivateKey(): string {
  * @returns The signed JWT token string
  */
 export function generateJwtToken(payload: object, expiresIn: number): string {
-	const secretKey: string = getPrivateKey();
-	return jwt.sign(payload, secretKey, {
+	const privateKey: string = getPrivateKey();
+	return jwt.sign(payload, privateKey, {
 		algorithm: 'RS256',
 		expiresIn: expiresIn,
 	});
@@ -38,8 +38,8 @@ export function generateJwtToken(payload: object, expiresIn: number): string {
  * @returns The decoded payload of the JWT token
  */
 export function verifyJwtToken(token: string): JwtPayload {
-	const secretKey: string = getPrivateKey();
-	const decoded = jwt.verify(token, secretKey, { algorithms: ['RS256'] });
+	const privateKey: string = getPrivateKey();
+	const decoded = jwt.verify(token, privateKey, { algorithms: ['RS256'] });
 
 	if (!decoded || typeof decoded !== 'object') {
 		throw new Error('Invalid Token!');
