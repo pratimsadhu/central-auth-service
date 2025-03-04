@@ -1,18 +1,6 @@
 import supabaseClient from '@config/supabase';
-import { generateJwtToken } from '@utils/jwt';
+import { generateTokens } from '@utils/jwt';
 import { hashPassword, verifyPassword } from '@utils/argon';
-
-/**
- * Generates an access token and a refresh token.
- * @param payload The payload to sign the tokens with.
- * @returns The access token and refresh token.
- */
-function generateTokens(payload: object) {
-	const access_token = generateJwtToken(payload, 60 * 60); // 1 hour
-	const refresh_token = generateJwtToken(payload, 30 * 24 * 60 * 60); // 30 days
-
-	return { access_token, refresh_token };
-}
 
 /**
  * The authentication service.
