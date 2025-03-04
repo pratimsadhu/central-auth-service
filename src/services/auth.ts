@@ -169,6 +169,7 @@ const authService = {
 			const user = data;
 			const payload = {
 				user_id: user.id,
+				email: email,
 				client_id: clientId,
 			};
 
