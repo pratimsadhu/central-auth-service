@@ -50,6 +50,24 @@ export function verifyJwtToken(token: string): JwtPayload {
 }
 
 /**
+ * Generates an access token and a refresh token.
+ * @param payload The payload to sign the tokens with.
+ * @param accessTokenExpiresIn The expiration time of the access token. Default is 1 hour.
+ * @param refreshTokenExpiresIn The expiration time of the refresh token. Default is 30 days.
+ * @returns The access token and refresh token.
+ */
+export function generateTokens(
+	payload: object,
+	accessTokenExpiresIn: number = 60 * 60, // 1 hour
+	refreshTokenExpiresIn: number = 30 * 24 * 60 * 60 // 30 days
+): { access_token: string; refresh_token: string } {
+	const access_token = generateJwtToken(payload, accessTokenExpiresIn);
+	const refresh_token = generateJwtToken(payload, refreshTokenExpiresIn);
+
+	return { access_token, refresh_token };
+}
+
+/**
  * Verifies a JWT token and generates a new token with the same payload
  * @param token The JWT to verify
  * @param expiresIn The expiration time of the new token
