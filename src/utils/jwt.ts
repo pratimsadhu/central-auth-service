@@ -34,22 +34,6 @@ export function generateJwtToken(payload: object, expiresIn: number): string {
 }
 
 /**
- * Verifies a JWT token and returns the decoded payload
- * @param token The JWT token to verify
- * @returns The decoded payload of the JWT token
- */
-export function verifyJwtToken(token: string): JwtPayload {
-	const publicKey: string = getKeys('JWT_PUBLIC_KEY');
-	const decoded = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
-
-	if (!decoded || typeof decoded !== 'object') {
-		throw new Error('Invalid Token!');
-	}
-
-	return decoded as JwtPayload;
-}
-
-/**
  * Generates an access token and a refresh token.
  * @param payload The payload to sign the tokens with.
  * @param accessTokenExpiresIn The expiration time of the access token. Default is 1 hour.
@@ -65,6 +49,22 @@ export function generateTokens(
 	const refresh_token = generateJwtToken(payload, refreshTokenExpiresIn);
 
 	return { access_token, refresh_token };
+}
+
+/**
+ * Verifies a JWT token and returns the decoded payload
+ * @param token The JWT token to verify
+ * @returns The decoded payload of the JWT token
+ */
+export function verifyJwtToken(token: string): JwtPayload {
+	const publicKey: string = getKeys('JWT_PUBLIC_KEY');
+	const decoded = jwt.verify(token, publicKey, { algorithms: ['RS256'] });
+
+	if (!decoded || typeof decoded !== 'object') {
+		throw new Error('Invalid Token!');
+	}
+
+	return decoded as JwtPayload;
 }
 
 /**

@@ -1,5 +1,6 @@
 import {
 	generateJwtToken,
+	generateTokens,
 	verifyJwtToken,
 	verifyAndGenerateToken,
 } from '@utils/jwt';
