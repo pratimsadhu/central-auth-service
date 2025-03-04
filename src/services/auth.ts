@@ -1,6 +1,7 @@
 import supabaseClient from '@config/supabase';
 import { generateTokens } from '@utils/jwt';
 import { hashPassword, verifyPassword } from '@utils/argon';
+import clientService from '@services/client';
 
 /**
  * The authentication service.
@@ -15,6 +16,10 @@ const authService = {
 	 */
 	signUp: async (email: string, password: string, clientId: string) => {
 		try {
+			// Verify the client.
+			const clientVerification = await clientService.verifyClient(clientId);
+			if (clientVerification.error) return clientVerification;
+
 			// Check if the user with this email & clientId already exists.
 			const { data: existingUser, error: findError } = await supabaseClient
 				.from('users')
@@ -76,6 +81,10 @@ const authService = {
 	 */
 	signIn: async (email: string, password: string, clientId: string) => {
 		try {
+			// Verify the client.
+			const clientVerification = await clientService.verifyClient(clientId);
+			if (clientVerification.error) return clientVerification;
+
 			// Fetch user with matching email and client_id.
 			const { data, error } = await supabaseClient
 				.from('users')
@@ -130,6 +139,11 @@ const authService = {
 		updatedData: { email: string; password: string }
 	) => {
 		try {
+			// Verify the client.
+			const clientVerification = await clientService.verifyClient(clientId);
+			if (clientVerification.error) return clientVerification;
+
+			// Fetch user with matching id and client_id.
 			const { data, error } = await supabaseClient
 				.from('users')
 				.select('*')
@@ -183,6 +197,10 @@ const authService = {
 	 */
 	delete: async (userId: string, clientId: string) => {
 		try {
+			// Verify the client.
+			const clientVerification = await clientService.verifyClient(clientId);
+			if (clientVerification.error) return clientVerification;
+
 			const { data, error } = await supabaseClient
 				.from('users')
 				.delete()
