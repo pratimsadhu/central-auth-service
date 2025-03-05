@@ -1,48 +1,37 @@
-import express, { Request, Response } from 'express';
+import { ApolloServer } from 'apollo-server-express';
+import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import { ApolloServer } from 'apollo-server-express';
 import typeDefs from '@graphql/schema';
 import resolvers from '@graphql/resolvers';
-import { VercelRequest, VercelResponse } from '@vercel/node';
 
 // Load environment variables
 dotenv.config();
 
-// Initialize Express app
+// Create Express app
 const app = express();
 
 // CORS setup
-const corsOptions = {
-	origin: '*', // TODO: Restrict to allowed domains in production
-	methods: ['GET', 'POST', 'PUT', 'DELETE'],
-	allowedHeaders: ['Content-Type', 'Authorization'],
-};
+app.use(cors({ origin: '*', methods: ['GET', 'POST', 'PUT', 'DELETE'] }));
 app.use(express.json());
-app.use(cors(corsOptions));
 
-// Function to initialize Apollo Server
-async function startApolloServer() {
-	const server = new ApolloServer({
-		typeDefs,
-		resolvers,
-	});
+// Apollo Server Setup
+const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
 
+async function startServer() {
 	await server.start();
 	server.applyMiddleware({ app: app as any, path: '/api' });
 }
 
-// Start Apollo Server asynchronously
-startApolloServer().catch((err) => {
-	console.error('Failed to start server:', err);
-});
+startServer().catch(console.error);
 
-// Health Check Route
-app.get('/', (req: Request, res: Response) => {
-	res.json({ message: 'Central Auth Service is running!' });
-});
-
-// Export the handler for Vercel
-export default function handler(req: VercelRequest, res: VercelResponse) {
-	return app(req, res);
+// Local development mode
+if (process.env.NODE_ENV !== 'vercel') {
+	const PORT = process.env.PORT || 8001;
+	app.listen(PORT, () => {
+		console.log(`🚀 Server running at http://localhost:${PORT}/api`);
+	});
 }
+
+// Export handler for Vercel deployment
+export default app;
