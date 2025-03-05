@@ -1,14 +1,14 @@
 {
 	"version": 2,
 	"functions": {
-		"api/graphql.js": {
+		"api/index.ts": {
 			"runtime": "nodejs18.x"
 		}
 	},
 	"routes": [
 		{
 			"src": "/api",
-			"dest": "/api/graphql.js"
+			"dest": "/api/index.ts"
 		}
 	]
 }
