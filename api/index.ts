@@ -22,7 +22,7 @@ const startApolloServer = async (
 	});
 
 	await server.start();
-	server.applyMiddleware({ app: app as any });
+	server.applyMiddleware({ app: app as any, path: '/api' });
 };
 
 startApolloServer(app, httpServer);
