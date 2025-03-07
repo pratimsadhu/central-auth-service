@@ -14,7 +14,7 @@ const resolvers = {
 			return verifyAndGenerateToken(token, 30 * 24 * 60 * 60);
 		},
 		generateToken: () => {
-			return generateJwtToken({ message: 'Hello, World!' }, 60 * 60);
+			return generateJwtToken({ id: "1", email: 'abc@example.com' }, 60 * 60);
 		},
 		sayHello: () => {
 			return {
