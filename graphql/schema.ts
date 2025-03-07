@@ -24,6 +24,7 @@ const typeDefs = gql`
 	type Query {
 		verifyToken(token: String!): User
 		generateRefreshToken(token: String!): String
+		generateToken: String
 		sayHello: HelloResponse
 	}
 
