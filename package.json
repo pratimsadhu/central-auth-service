@@ -8,7 +8,10 @@
 	"scripts": {
 		"test": "jest --coverage",
 		"test:watch": "jest --watch",
-		"test:debug": "jest --inspect-brk --runInBand"
+		"test:debug": "jest --inspect-brk --runInBand",
+		"dev": "nodemon --exec ts-node dev.ts",
+		"build": "tsc",
+		"start": "node dist/index.js"
 	},
 	"devDependencies": {
 		"@types/argon2": "^0.15.4",
