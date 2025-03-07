@@ -1,29 +1,39 @@
 {
-  "name": "central-auth-service",
-  "version": "1.0.0",
-  "main": "index.js",
-  "repository": "https://github.com/pratimsadhu/central-auth-service.git",
-  "author": "Pratim Sadhu <pratimsadhu@icloud.com>",
-  "license": "MIT",
-  "devDependencies": {
-    "@types/argon2": "^0.15.4",
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "^22.13.9",
-    "consola": "^3.4.0",
-    "dotenv": "^16.4.7",
-    "nodemon": "^3.1.9",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.49.1",
-    "apollo-server-core": "^3.13.0",
-    "apollo-server-express": "^3.13.0",
-    "argon2": "^0.41.1",
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "graphql": "^16.10.0",
-    "jsonwebtoken": "^9.0.2"
-  }
+	"name": "central-auth-service",
+	"version": "1.0.0",
+	"main": "index.js",
+	"repository": "https://github.com/pratimsadhu/central-auth-service.git",
+	"author": "Pratim Sadhu <pratimsadhu@icloud.com>",
+	"license": "MIT",
+	"scripts": {
+		"test": "jest --coverage",
+		"test:watch": "jest --watch",
+		"test:debug": "jest --inspect-brk --runInBand"
+	},
+	"devDependencies": {
+		"@types/argon2": "^0.15.4",
+		"@types/express": "^5.0.0",
+		"@types/jest": "^29.5.14",
+		"@types/jsonwebtoken": "^9.0.9",
+		"@types/node": "^22.13.9",
+		"@types/supertest": "^6.0.2",
+		"consola": "^3.4.0",
+		"dotenv": "^16.4.7",
+		"jest": "^29.7.0",
+		"nodemon": "^3.1.9",
+		"supertest": "^7.0.0",
+		"ts-jest": "^29.2.6",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.2"
+	},
+	"dependencies": {
+		"@supabase/supabase-js": "^2.49.1",
+		"apollo-server-core": "^3.13.0",
+		"apollo-server-express": "^3.13.0",
+		"argon2": "^0.41.1",
+		"cors": "^2.8.5",
+		"express": "^4.21.2",
+		"graphql": "^16.10.0",
+		"jsonwebtoken": "^9.0.2"
+	}
 }

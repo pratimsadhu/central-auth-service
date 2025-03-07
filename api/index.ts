@@ -3,8 +3,8 @@ import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import http from 'http';
 import express from 'express';
 import cors from 'cors';
-import typeDefs from '../graphql/schema';
-import resolvers from '../graphql/resolvers';
+import typeDefs from '../src/graphql/schema';
+import resolvers from '../src/graphql/resolvers';
 
 const app = express();
 app.use(cors());

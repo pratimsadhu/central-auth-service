@@ -1,7 +1,7 @@
 import supabaseClient from '../config/supabase';
 import { generateTokens, verifyJwtToken } from '../utils/jwt';
 import { hashPassword, verifyPassword } from '../utils/argon';
-import clientService from '../services/client';
+import clientService from './client';
 
 /**
  * The authentication service.
