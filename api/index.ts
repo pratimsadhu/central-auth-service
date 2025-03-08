@@ -19,6 +19,10 @@ const startApolloServer = async (
 		typeDefs,
 		resolvers,
 		plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+		context: ({ req }) => {
+			const client_id = req.headers['x-client-id'];
+			return { client_id };
+		},
 	});
 
 	await server.start();
