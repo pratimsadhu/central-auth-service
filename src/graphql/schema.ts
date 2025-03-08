@@ -7,8 +7,11 @@ const typeDefs = gql`
 	}
 
 	type AuthPayload {
-		token: String!
-		user: User!
+		access_token: String
+		refresh_token: String
+		message: String
+		status: Int!
+		error: String
 	}
 
 	type HelloResponse {
@@ -29,15 +32,14 @@ const typeDefs = gql`
 	}
 
 	type Mutation {
-		signUp(email: String!, password: String!, client_id: String!): AuthPayload!
-		signIn(email: String!, password: String!, client_id: String!): AuthPayload!
+		signUp(email: String!, password: String!): AuthPayload!
+		signIn(email: String!, password: String!): AuthPayload!
 		updateUser(
 			user_id: String!
-			client_id: String!
 			token: String!
 			updated_data: UserUpdateInput!
 		): AuthPayload!
-		deleteUser(user_id: String!, client_id: String!, token: String!): Boolean!
+		deleteUser(user_id: String!, token: String!): Boolean!
 	}
 `;
 
