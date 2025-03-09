@@ -41,17 +41,19 @@ const authService = {
 			// Hash the password before storing.
 			const hashedPassword = await hashPassword(password);
 
-			const { data, error } = await supabaseClient
+			const { data: user, error } = await supabaseClient
 				.from('users')
 				.insert([
 					{ email: email, password: hashedPassword, client_id: clientId },
 				])
 				.select('*')
-				.single();
+				.maybeSingle();
 
-			if (error) throw new Error(error.message);
+			if (error) {
+				console.error('Signup Error:', error);
+				throw new Error(error.message || 'Error inserting user into database.');
+			}
 
-			const user = data;
 			const payload = {
 				user_id: user.id,
 				email: email,
@@ -86,20 +88,22 @@ const authService = {
 			if (clientVerification.error) return clientVerification;
 
 			// Fetch user with matching email and client_id.
-			const { data, error } = await supabaseClient
+			const { data: user, error } = await supabaseClient
 				.from('users')
 				.select('*')
 				.eq('email', email)
 				.eq('client_id', clientId)
 				.maybeSingle();
 
-			if (error) throw new Error(error.message);
+			if (error) {
+				console.error('Signin Error:', error);
+				throw new Error(error.message || 'Error signing in.');
+			}
 
-			if (!data) {
+			if (!user) {
 				return { error: 'User not found', status: 404 };
 			}
 
-			const user = data;
 			const isPasswordValid = await verifyPassword(user.password, password);
 
 			if (!isPasswordValid) {
