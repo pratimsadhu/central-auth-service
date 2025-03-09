@@ -3,6 +3,7 @@ import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import http from 'http';
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
 import typeDefs from '../src/graphql/schema';
 import resolvers from '../src/graphql/resolvers';
 import pageRouter from '../src/routes/pageRoutes';
@@ -36,8 +37,19 @@ const startApolloServer = async (
 	});
 
 	await server.start();
-	app.use('/api', authentication);
+	app.use('/api', (req, res, next) => {
+		// Only apply authentication middleware for non-GET requests
+		if (req.method !== 'GET') {
+			return authentication(req, res, next);
+		}
+		next();
+	});
 	server.applyMiddleware({ app: app as any, path: '/api' });
+
+	// Use 404 handler for all other routes
+	app.use((req, res) => {
+		res.status(404).sendFile(path.join(__dirname, '../src/public/404.html'));
+	  });
 };
 
 startApolloServer(app, httpServer);
