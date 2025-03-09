@@ -11,8 +11,7 @@ const clientService = {
 			const { data, error } = await supabaseClient
 				.from('clients')
 				.select('id')
-				.eq('id', clientId)
-				.single();
+				.eq('id', clientId);
 
 			if (error) throw new Error(error.message);
 			if (!data) {
