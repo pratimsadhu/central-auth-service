@@ -32,3 +32,6 @@ yarn.lock
 
 # Ignore Jest coverage reports
 coverage/
+
+# Ignore concurrent test file
+concurrent-test.js
