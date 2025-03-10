@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>GraphQL Auth API</title>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<style>
+			:root {
+				--primary-color: #ffd100;
+				--secondary-color: #ffc000;
+				--accent-color: #ffee32;
+				--dark-color: #222222;
+				--light-color: #f8f9fa;
+				--gray-color: #e9ecef;
+				--text-color: #222222;
+				--text-light: #575757;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				transition: all 0.3s ease;
+			}
+
+			body {
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				line-height: 1.6;
+				color: var(--text-color);
+				background-color: #fafafa;
+			}
+
+			a {
+				text-decoration: none;
+				color: var(--dark-color);
+			}
+
+			ul {
+				list-style: none;
+			}
+
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 20px;
+			}
+
+			/* Header */
+			header {
+				background-color: white;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+				position: sticky;
+				top: 0;
+				z-index: 100;
+			}
+
+			header .container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 1rem 20px;
+			}
+
+			.logo {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.logo i {
+				font-size: 1.8rem;
+				color: var(--primary-color);
+			}
+
+			.logo h1 {
+				font-size: 1.5rem;
+				font-weight: 600;
+			}
+
+			nav ul {
+				display: flex;
+				gap: 30px;
+			}
+
+			nav a {
+				color: var(--text-color);
+				font-weight: 500;
+				padding: 5px 0;
+				position: relative;
+			}
+
+			nav a:hover,
+			nav a.active {
+				color: var(--primary-color);
+			}
+
+			nav a.active::after {
+				content: '';
+				position: absolute;
+				bottom: -2px;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background-color: var(--primary-color);
+			}
+
+			/* Hero section */
+			.hero {
+				background: linear-gradient(135deg, var(--dark-color), #000000);
+				color: white;
+				padding: 5rem 0;
+				text-align: center;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.hero::before {
+				content: '';
+				position: absolute;
+				top: -50px;
+				left: -50px;
+				right: -50px;
+				bottom: -50px;
+				background: repeating-linear-gradient(
+					45deg,
+					rgba(255, 209, 0, 0.05),
+					rgba(255, 209, 0, 0.05) 10px,
+					rgba(0, 0, 0, 0) 10px,
+					rgba(0, 0, 0, 0) 20px
+				);
+				z-index: 1;
+				animation: backgroundMove 20s linear infinite;
+			}
+
+			@keyframes backgroundMove {
+				0% {
+					background-position: 0 0;
+				}
+				100% {
+					background-position: 50px 50px;
+				}
+			}
+
+			.hero .container {
+				position: relative;
+				z-index: 2;
+			}
+
+			.hero h1 {
+				font-size: 3rem;
+				margin-bottom: 0.5rem;
+				text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+			}
+
+			.hero h2 {
+				font-size: 1.8rem;
+				font-weight: 400;
+				margin-bottom: 1.5rem;
+				color: var(--primary-color);
+			}
+
+			.hero p {
+				font-size: 1.2rem;
+				max-width: 700px;
+				margin: 0 auto 2rem;
+			}
+
+			.cta-buttons {
+				display: flex;
+				gap: 20px;
+				justify-content: center;
+			}
+
+			.btn {
+				display: inline-block;
+				padding: 14px 32px;
+				border-radius: 50px;
+				font-weight: 600;
+				transition: all 0.3s ease;
+				position: relative;
+				overflow: hidden;
+				z-index: 1;
+			}
+
+			.btn:after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: -2;
+			}
+
+			.btn:before {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 0%;
+				height: 100%;
+				transition: all 0.3s;
+				z-index: -1;
+			}
+
+			.btn:hover {
+				transform: translateY(-3px);
+				box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+			}
+
+			.btn:hover:before {
+				width: 100%;
+			}
+
+			.btn.primary {
+				background-color: var(--primary-color);
+				color: var(--dark-color);
+			}
+
+			.btn.primary:before {
+				background-color: white;
+			}
+
+			.btn.secondary {
+				background-color: transparent;
+				border: 2px solid var(--primary-color);
+				color: var(--primary-color);
+			}
+
+			.btn.secondary:before {
+				background-color: rgba(255, 209, 0, 0.1);
+			}
+
+			/* Features section */
+			.features {
+				padding: 5rem 0;
+			}
+
+			.features h2 {
+				text-align: center;
+				font-size: 2.2rem;
+				margin-bottom: 1rem;
+				position: relative;
+			}
+
+			.features h2:after {
+				content: '';
+				display: block;
+				width: 80px;
+				height: 4px;
+				background: var(--primary-color);
+				margin: 15px auto 30px;
+				border-radius: 2px;
+			}
+
+			.section-subtitle {
+				text-align: center;
+				color: var(--text-light);
+				margin-bottom: 3rem;
+				max-width: 700px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			.feature-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 2rem;
+			}
+
+			.feature-card {
+				background-color: white;
+				border-radius: 12px;
+				padding: 2.5rem 2rem;
+				box-shadow: 0 5px 30px rgba(0, 0, 0, 0.05);
+				transition: transform 0.3s ease, box-shadow 0.3s ease;
+				border: 1px solid rgba(0, 0, 0, 0.05);
+			}
+
+			.feature-card:hover {
+				transform: translateY(-10px);
+				box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+				border-color: var(--primary-color);
+			}
+
+			.feature-card .icon {
+				width: 70px;
+				height: 70px;
+				border-radius: 50%;
+				background-color: var(--primary-color);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				margin-bottom: 1.5rem;
+				box-shadow: 0 10px 20px rgba(255, 209, 0, 0.2);
+			}
+
+			.feature-card .icon i {
+				font-size: 1.7rem;
+				color: var(--dark-color);
+			}
+
+			.feature-card h3 {
+				font-size: 1.4rem;
+				margin-bottom: 1rem;
+				position: relative;
+			}
+
+			.feature-card h3:after {
+				content: '';
+				display: block;
+				width: 40px;
+				height: 3px;
+				background: var(--primary-color);
+				margin: 10px 0;
+				border-radius: 1.5px;
+			}
+
+			/* Code example section */
+			.code-example {
+				background-color: var(--dark-color);
+				padding: 5rem 0;
+				color: white;
+			}
+
+			.code-example h2 {
+				text-align: center;
+				font-size: 2.2rem;
+				margin-bottom: 1rem;
+				color: white;
+			}
+
+			.code-example h2:after {
+				content: '';
+				display: block;
+				width: 80px;
+				height: 4px;
+				background: var(--primary-color);
+				margin: 15px auto 30px;
+				border-radius: 2px;
+			}
+
+			.code-cards {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 2rem;
+			}
+
+			.code-card {
+				background-color: #2d2d2d;
+				border-radius: 12px;
+				padding: 1.5rem;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+				overflow: hidden;
+				position: relative;
+			}
+
+			.code-card::after {
+				content: '';
+				position: absolute;
+				bottom: 0;
+				left: 0;
+				width: 100%;
+				height: 5px;
+				background: var(--primary-color);
+			}
+
+			.code-card h3 {
+				color: var(--primary-color);
+				margin-bottom: 1rem;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.code-card h3 .copy-btn {
+				background: transparent;
+				border: none;
+				color: #aaa;
+				cursor: pointer;
+				font-size: 0.9rem;
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				padding: 5px 10px;
+				border-radius: 4px;
+			}
+
+			.code-card h3 .copy-btn:hover {
+				background: rgba(255, 255, 255, 0.1);
+				color: white;
+			}
+
+			.code-block {
+				background-color: #1e1e1e;
+				border-radius: 8px;
+				padding: 1.5rem;
+				margin: 1rem 0;
+				overflow-x: auto;
+				position: relative;
+			}
+
+			.code-block code {
+				font-family: 'Fira Code', 'Courier New', Courier, monospace;
+				font-size: 0.95rem;
+				color: #e6e6e6;
+				line-height: 1.5;
+			}
+
+			.code-block pre {
+				margin: 0;
+			}
+
+			.code-tag {
+				color: #569cd6;
+			}
+
+			.code-string {
+				color: #ce9178;
+			}
+
+			.code-keyword {
+				color: #c586c0;
+			}
+
+			.code-function {
+				color: #dcdcaa;
+			}
+
+			.code-comment {
+				color: #6a9955;
+			}
+
+			/* Footer */
+			footer {
+				background-color: var(--dark-color);
+				color: white;
+				padding: 3rem 0 1.5rem;
+			}
+
+			.footer-content {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 2rem;
+				margin-bottom: 2rem;
+			}
+
+			.footer-logo {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.footer-logo i {
+				font-size: 1.8rem;
+				color: var(--primary-color);
+			}
+
+			.footer-links h3 {
+				margin-bottom: 1rem;
+				font-size: 1.2rem;
+				color: var(--primary-color);
+			}
+
+			.footer-links ul {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.footer-links a {
+				color: #adb5bd;
+				transition: color 0.3s ease;
+			}
+
+			.footer-links a:hover {
+				color: var(--primary-color);
+			}
+
+			.copyright {
+				text-align: center;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				padding-top: 1.5rem;
+				color: #adb5bd;
+				font-size: 0.9rem;
+			}
+
+			@media (max-width: 768px) {
+				.docs-content .container {
+					grid-template-columns: 1fr;
+				}
+
+				.docs-sidebar {
+					position: static;
+					margin-bottom: 2rem;
+				}
+
+				.hero h1 {
+					font-size: 2.2rem;
+				}
+
+				.hero h2 {
+					font-size: 1.4rem;
+				}
+
+				.cta-buttons {
+					flex-direction: column;
+					align-items: center;
+					gap: 15px;
+				}
+
+				.btn {
+					width: 100%;
+					max-width: 300px;
+					text-align: center;
+				}
+
+				.code-cards {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			@media (max-width: 576px) {
+				nav ul {
+					gap: 15px;
+				}
+
+				.hero {
+					padding: 3rem 0;
+				}
+
+				.feature-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<div class="container">
+				<div class="logo">
+					<i class="fas fa-database"></i>
+					<h1>GraphQL Auth API</h1>
+				</div>
+				<nav>
+					<ul>
+						<li><a href="/" class="active">Home</a></li>
+						<li><a href="/api-documentation">Documentation</a></li>
+						<li><a href="/api">API Endpoint</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+
+		<section class="hero">
+			<div class="container">
+				<h1>Secure Authentication API</h1>
+				<h2>Built with Apollo GraphQL & Express</h2>
+				<p>
+					A professional, secure, and scalable authentication solution for your applications
+				</p>
+				<div class="cta-buttons">
+					<a href="/api-documentation" class="btn primary"
+						>View Documentation</a
+					>
+					<a href="#features" class="btn secondary">Learn More</a>
+				</div>
+			</div>
+		</section>
+
+		<section id="features" class="features">
+			<div class="container">
+				<h2>Key Features</h2>
+				<p class="section-subtitle">
+					Our GraphQL Auth API provides everything you need for implementing
+					robust user authentication in your applications
+				</p>
+				<div class="feature-grid">
+					<div class="feature-card">
+						<div class="icon">
+							<i class="fas fa-lock"></i>
+						</div>
+						<h3>Secure Authentication</h3>
+						<p>
+							JWT-based authentication with refresh tokens for enhanced security
+							and seamless user experience
+						</p>
+					</div>
+					<div class="feature-card">
+						<div class="icon">
+							<i class="fas fa-key"></i>
+						</div>
+						<h3>Client Registration</h3>
+						<p>
+							Unique client IDs and public keys for secure data decryption and
+							encrypted communications
+						</p>
+					</div>
+					<div class="feature-card">
+						<div class="icon">
+							<i class="fas fa-code"></i>
+						</div>
+						<h3>GraphQL API</h3>
+						<p>
+							Modern Apollo GraphQL endpoint with comprehensive resolvers and
+							intuitive schema design
+						</p>
+					</div>
+					<div class="feature-card">
+						<div class="icon">
+							<i class="fas fa-user-shield"></i>
+						</div>
+						<h3>User Management</h3>
+						<p>
+							Complete user lifecycle management including sign-up, sign-in,
+							profile updates, and account deletion
+						</p>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="code-example">
+			<div class="container">
+				<h2>Quick Start</h2>
+				<div class="code-cards">
+					<div class="code-card">
+						<h3>
+							Sign Up Example
+							<button
+								class="copy-btn"
+								onclick="navigator.clipboard.writeText(document.querySelector('#signup-code').textContent)"
+							>
+								<i class="fas fa-copy"></i> Copy
+							</button>
+						</h3>
+						<div class="code-block">
+							<pre><code id="signup-code"><span class="code-tag">mutation</span> {
+  <span class="code-function">signUp</span>(
+    email: <span class="code-string">"user@example.com"</span>, 
+    password: <span class="code-string">"secure-password"</span>
+  ) {
+    access_token
+    refresh_token
+    message
+    status
+    error
+  }
+}</code></pre>
+						</div>
+					</div>
+					<div class="code-card">
+						<h3>
+							Sign In Example
+							<button
+								class="copy-btn"
+								onclick="navigator.clipboard.writeText(document.querySelector('#signin-code').textContent)"
+							>
+								<i class="fas fa-copy"></i> Copy
+							</button>
+						</h3>
+						<div class="code-block">
+							<pre><code id="signin-code"><span class="code-tag">mutation</span> {
+  <span class="code-function">signIn</span>(
+    email: <span class="code-string">"user@example.com"</span>, 
+    password: <span class="code-string">"secure-password"</span>
+  ) {
+    access_token
+    refresh_token
+    message
+    status
+    error
+  }
+}</code></pre>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<footer>
+			<div class="container">
+				<div class="footer-content">
+					<div class="footer-logo">
+						<i class="fas fa-database"></i>
+						<h2>GraphQL Auth API</h2>
+					</div>
+					<div class="footer-links">
+						<h3>Resources</h3>
+						<ul>
+							<li><a href="/api-documentation">API Documentation</a></li>
+							<li><a href="/api">API Endpoint</a></li>
+							<li><a href="#">Contact Support</a></li>
+						</ul>
+					</div>
+					<div class="footer-links">
+						<h3>Quick Links</h3>
+						<ul>
+							<li><a href="#features">Features</a></li>
+							<li>
+								<a href="/api-documentation#authentication">Authentication</a>
+							</li>
+							<li><a href="/api-documentation#queries">Queries</a></li>
+							<li><a href="/api-documentation#mutations">Mutations</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="copyright">
+					<p>&copy; 2025 GraphQL Auth API. All rights reserved.</p>
+				</div>
+			</div>
+		</footer>
+	</body>
+</html>
