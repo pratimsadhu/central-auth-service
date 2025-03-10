@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>API Documentation - GraphQL Auth API</title>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<style>
+			:root {
+				--primary-color: #ffd100;
+				--secondary-color: #ffc000;
+				--accent-color: #ffee32;
+				--dark-color: #222222;
+				--light-color: #f8f9fa;
+				--gray-color: #e9ecef;
+				--text-color: #222222;
+				--text-light: #575757;
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+				transition: all 0.3s ease;
+			}
+
+			body {
+				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+				line-height: 1.6;
+				color: var(--text-color);
+				background-color: #fafafa;
+			}
+
+			a {
+				text-decoration: none;
+				color: var(--dark-color);
+			}
+
+			ul {
+				list-style: none;
+			}
+
+			.container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 20px;
+			}
+
+			/* Header */
+			header {
+				background-color: white;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+				position: sticky;
+				top: 0;
+				z-index: 100;
+			}
+
+			header .container {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 1rem 20px;
+			}
+
+			.logo {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.logo i {
+				font-size: 1.8rem;
+				color: var(--primary-color);
+			}
+
+			.logo h1 {
+				font-size: 1.5rem;
+				font-weight: 600;
+			}
+
+			nav ul {
+				display: flex;
+				gap: 30px;
+			}
+
+			nav a {
+				color: var(--text-color);
+				font-weight: 500;
+				padding: 5px 0;
+				position: relative;
+			}
+
+			nav a:hover,
+			nav a.active {
+				color: var(--primary-color);
+			}
+
+			nav a.active::after {
+				content: '';
+				position: absolute;
+				bottom: -2px;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background-color: var(--primary-color);
+			}
+
+			/* Documentation header */
+			.docs-header {
+				background: linear-gradient(135deg, var(--dark-color), #000000);
+				color: white;
+				padding: 3rem 0;
+				text-align: center;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.docs-header::before {
+				content: '';
+				position: absolute;
+				top: -50px;
+				left: -50px;
+				right: -50px;
+				bottom: -50px;
+				background: repeating-linear-gradient(
+					45deg,
+					rgba(255, 209, 0, 0.05),
+					rgba(255, 209, 0, 0.05) 10px,
+					rgba(0, 0, 0, 0) 10px,
+					rgba(0, 0, 0, 0) 20px
+				);
+				z-index: 1;
+				animation: backgroundMove 20s linear infinite;
+			}
+
+			@keyframes backgroundMove {
+				0% {
+					background-position: 0 0;
+				}
+				100% {
+					background-position: 50px 50px;
+				}
+			}
+
+			.docs-header .container {
+				position: relative;
+				z-index: 2;
+			}
+
+			.docs-header h1 {
+				font-size: 2.8rem;
+				margin-bottom: 0.5rem;
+				text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+			}
+
+			.docs-header p {
+				font-size: 1.2rem;
+				max-width: 700px;
+				margin: 0 auto;
+				color: #e0e0e0;
+			}
+
+			/* Documentation content */
+			.docs-content {
+				padding: 3rem 0;
+			}
+
+			.docs-content .container {
+				display: grid;
+				grid-template-columns: 280px 1fr;
+				gap: 3rem;
+			}
+
+			.docs-sidebar {
+				position: sticky;
+				top: 100px;
+				height: fit-content;
+			}
+
+			.docs-sidebar ul {
+				background-color: white;
+				border-radius: 10px;
+				padding: 1.5rem;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+			}
+
+			.docs-sidebar li {
+				margin-bottom: 0.8rem;
+			}
+
+			.docs-sidebar li:last-child {
+				margin-bottom: 0;
+			}
+
+			.docs-sidebar a {
+				display: block;
+				padding: 0.8rem 1rem;
+				color: var(--text-color);
+				border-radius: 5px;
+				transition: all 0.2s ease;
+				font-weight: 500;
+			}
+
+			.docs-sidebar a:hover {
+				background-color: var(--gray-color);
+				color: var(--primary-color);
+			}
+
+			.docs-sidebar a.active {
+				background-color: var(--primary-color);
+				color: var(--dark-color);
+			}
+
+			.docs-main section {
+				margin-bottom: 3rem;
+				background-color: white;
+				border-radius: 10px;
+				padding: 2rem;
+				box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+			}
+
+			.docs-main section:last-child {
+				margin-bottom: 0;
+			}
+
+			.docs-main h2 {
+				font-size: 1.8rem;
+				margin-bottom: 1.5rem;
+				padding-bottom: 0.5rem;
+				border-bottom: 1px solid var(--gray-color);
+				position: relative;
+			}
+
+			.docs-main h2::after {
+				content: '';
+				position: absolute;
+				bottom: -1px;
+				left: 0;
+				width: 100px;
+				height: 3px;
+				background-color: var(--primary-color);
+				border-radius: 1.5px;
+			}
+
+			.docs-main h3 {
+				font-size: 1.4rem;
+				margin: 1.8rem 0 1rem;
+				color: var(--dark-color);
+			}
+
+			.docs-main p {
+				margin-bottom: 1rem;
+				line-height: 1.7;
+				color: var(--text-light);
+			}
+
+			.docs-main ul,
+			.docs-main ol {
+				margin-bottom: 1.5rem;
+				padding-left: 1.8rem;
+				color: var(--text-light);
+			}
+
+			.docs-main ul {
+				list-style: disc;
+			}
+
+			.docs-main ol {
+				list-style: decimal;
+			}
+
+			.docs-main li {
+				margin-bottom: 0.8rem;
+			}
+
+			.code-block {
+				background-color: #1e1e1e;
+				border-radius: 8px;
+				margin: 1.5rem 0;
+				overflow: hidden;
+				position: relative;
+			}
+
+			.code-block-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				background-color: #2d2d2d;
+				padding: 0.8rem 1.5rem;
+				font-family: 'Fira Code', 'Courier New', Courier, monospace;
+				font-size: 0.9rem;
+				color: #e0e0e0;
+			}
+
+			.code-block-content {
+				padding: 1.5rem;
+				overflow-x: auto;
+			}
+
+			.code-block pre {
+				margin: 0;
+			}
+
+			.code-block code {
+				font-family: 'Fira Code', 'Courier New', Courier, monospace;
+				font-size: 0.95rem;
+				color: #e6e6e6;
+				line-height: 1.5;
+			}
+
+			.code-tag {
+				color: #569cd6;
+			}
+
+			.code-string {
+				color: #ce9178;
+			}
+
+			.code-keyword {
+				color: #c586c0;
+			}
+
+			.code-function {
+				color: #dcdcaa;
+			}
+
+			.code-comment {
+				color: #6a9955;
+			}
+
+			.copy-btn {
+				background: transparent;
+				border: none;
+				color: #aaa;
+				cursor: pointer;
+				font-size: 0.9rem;
+				display: flex;
+				align-items: center;
+				gap: 5px;
+				padding: 5px 10px;
+				border-radius: 4px;
+			}
+
+			.copy-btn:hover {
+				background: rgba(255, 255, 255, 0.1);
+				color: white;
+			}
+
+			.copy-success {
+				position: absolute;
+				top: -30px;
+				right: 10px;
+				background-color: rgba(255, 255, 255, 0.9);
+				color: var(--dark-color);
+				padding: 5px 10px;
+				border-radius: 4px;
+				font-size: 0.8rem;
+				opacity: 0;
+				transition: opacity 0.3s;
+			}
+
+			.show-success {
+				opacity: 1;
+			}
+
+			.api-endpoint {
+				margin-bottom: 2.5rem;
+				padding: 1.5rem;
+				background-color: #f9f9f9;
+				border-radius: 8px;
+				border-left: 5px solid var(--primary-color);
+			}
+
+			.api-endpoint:last-child {
+				margin-bottom: 0;
+			}
+
+			.api-endpoint h3 {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				margin-top: 0;
+				color: var(--dark-color);
+			}
+
+			.api-endpoint h3 i {
+				color: var(--primary-color);
+			}
+
+			.api-endpoint p {
+				margin-bottom: 1rem;
+			}
+
+			.parameter-table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 1.5rem 0;
+			}
+
+			.parameter-table th,
+			.parameter-table td {
+				padding: 12px 15px;
+				text-align: left;
+				border-bottom: 1px solid #eee;
+			}
+
+			.parameter-table th {
+				background-color: #f5f5f5;
+				font-weight: 600;
+			}
+
+			.parameter-table td:first-child {
+				font-weight: 500;
+				color: var(--dark-color);
+			}
+
+			.parameter-table tr:last-child td {
+				border-bottom: none;
+			}
+
+			.parameter-table tr:hover {
+				background-color: #f9f9f9;
+			}
+
+			.note-box {
+				background-color: #fff5d6;
+				border-left: 4px solid var(--primary-color);
+				padding: 1.2rem 1.5rem;
+				margin: 1.5rem 0;
+				border-radius: 0 8px 8px 0;
+			}
+
+			.note-box p {
+				margin: 0;
+				font-weight: 500;
+			}
+
+			.note-box p strong {
+				color: var(--dark-color);
+			}
+
+			/* Footer */
+			footer {
+				background-color: var(--dark-color);
+				color: white;
+				padding: 3rem 0 1.5rem;
+			}
+
+			.footer-content {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+				gap: 2rem;
+				margin-bottom: 2rem;
+			}
+
+			.footer-logo {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.footer-logo i {
+				font-size: 1.8rem;
+				color: var(--primary-color);
+			}
+
+			.footer-links h3 {
+				margin-bottom: 1rem;
+				font-size: 1.2rem;
+				color: var(--primary-color);
+			}
+
+			.footer-links ul {
+				display: flex;
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.footer-links a {
+				color: #adb5bd;
+				transition: color 0.3s ease;
+			}
+
+			.footer-links a:hover {
+				color: var(--primary-color);
+			}
+
+			.copyright {
+				text-align: center;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				padding-top: 1.5rem;
+				color: #adb5bd;
+				font-size: 0.9rem;
+			}
+
+			@media (max-width: 992px) {
+				.docs-content .container {
+					grid-template-columns: 1fr;
+				}
+
+				.docs-sidebar {
+					position: static;
+					margin-bottom: 2rem;
+				}
+
+				.docs-sidebar ul {
+					display: flex;
+					flex-wrap: wrap;
+					gap: 10px;
+				}
+
+				.docs-sidebar li {
+					margin-bottom: 0;
+				}
+
+				.docs-sidebar a {
+					padding: 0.6rem 1rem;
+					font-size: 0.9rem;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.docs-header h1 {
+					font-size: 2.2rem;
+				}
+
+				.docs-sidebar ul {
+					flex-direction: column;
+				}
+
+				.docs-sidebar li {
+					margin-bottom: 0.5rem;
+				}
+
+				.parameter-table {
+					display: block;
+					overflow-x: auto;
+				}
+			}
+
+			@media (max-width: 576px) {
+				nav ul {
+					gap: 15px;
+				}
+
+				.docs-header {
+					padding: 2.5rem 0;
+				}
+
+				.api-endpoint h3 {
+					flex-direction: column;
+					align-items: flex-start;
+					gap: 5px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<div class="container">
+				<div class="logo">
+					<i class="fas fa-database"></i>
+					<h1>GraphQL Auth API</h1>
+				</div>
+				<nav>
+					<ul>
+						<li><a href="/">Home</a></li>
+						<li>
+							<a href="/api-documentation" class="active">Documentation</a>
+						</li>
+						<li><a href="/api">API Endpoint</a></li>
+					</ul>
+				</nav>
+			</div>
+		</header>
+
+		<section class="docs-header">
+			<div class="container">
+				<h1>API Documentation</h1>
+				<p>Complete guide to using our GraphQL Authentication API</p>
+			</div>
+		</section>
+
+		<section class="docs-content">
+			<div class="container">
+				<div class="docs-sidebar">
+					<ul>
+						<li><a href="#introduction">Introduction</a></li>
+						<li><a href="#authentication">Authentication</a></li>
+						<li><a href="#graphql-endpoint">GraphQL Endpoint</a></li>
+						<li><a href="#queries">Queries</a></li>
+						<li><a href="#mutations">Mutations</a></li>
+						<li><a href="#error-handling">Error Handling</a></li>
+					</ul>
+				</div>
+
+				<div class="docs-main">
+					<section id="introduction">
+						<h2>Introduction</h2>
+						<p>
+							Our API provides a comprehensive authentication system built on
+							Apollo GraphQL and Express. It offers secure user management
+							capabilities with JWT-based authentication and secure token
+							refresh mechanisms.
+						</p>
+
+						<p>
+							The GraphQL Auth API is designed to be a complete solution for
+							user authentication in modern web and mobile applications. It
+							handles user registration, authentication, token management, and
+							user data operations through a clean GraphQL interface.
+						</p>
+
+						<div class="note-box">
+							<p>
+								<strong>Note:</strong> This documentation assumes you have basic
+								familiarity with GraphQL concepts and operations. If you're new
+								to GraphQL, we recommend reviewing the
+								<a
+									href="https://graphql.org/learn/"
+									target="_blank"
+									rel="noopener"
+									>official GraphQL documentation</a
+								>
+								before proceeding.
+							</p>
+						</div>
+					</section>
+
+					<section id="authentication">
+						<h2>Authentication</h2>
+						<p>
+							To use this API, you'll need to follow these steps to authenticate
+							your requests:
+						</p>
+
+						<ol>
+							<li>
+								<h3>Obtain Client Credentials</h3>
+								<p>
+									Contact our team to receive a client ID and public key. These
+									credentials are essential for accessing our API and ensuring
+									secure communications.
+								</p>
+							</li>
+
+							<li>
+								<h3>Include Headers in Requests</h3>
+								<p>
+									All requests to the API must include the following header:
+								</p>
+
+								<div class="code-block">
+									<div class="code-block-header">
+										<span>Required Headers</span>
+										<button class="copy-btn" data-id="client-id-header">
+											<i class="fas fa-copy"></i> Copy
+										</button>
+										<span
+											id="copy-success-client-id-header"
+											class="copy-success"
+											>Copied!</span
+										>
+									</div>
+									<div class="code-block-content">
+										<pre><code>client_id: YOUR_CLIENT_ID</code></pre>
+									</div>
+								</div>
+							</li>
+
+							<li>
+								<h3>Decrypt Data</h3>
+								<p>
+									Use your provided public key to decrypt sensitive data and
+									tokens returned by the API. This ensures that your
+									authentication tokens remain secure during transmission.
+								</p>
+
+								<p>
+									Once you've obtained a JWT token from the signIn or signUp
+									mutations, you should include it in subsequent requests that
+									require authentication:
+								</p>
+
+								<div class="code-block">
+									<div class="code-block-header">
+										<span>Authorization Header</span>
+										<button class="copy-btn" data-id="auth-header">
+											<i class="fas fa-copy"></i> Copy
+										</button>
+										<span id="copy-success-auth-header" class="copy-success"
+											>Copied!</span
+										>
+									</div>
+									<div class="code-block-content">
+										<pre><code>Authorization: Bearer YOUR_JWT_TOKEN</code></pre>
+									</div>
+								</div>
+							</li>
+						</ol>
+
+						<h3>Token Lifecycle</h3>
+						<p>
+							Our authentication system uses JWT (JSON Web Tokens) with the
+							following characteristics:
+						</p>
+
+						<ul>
+							<li>Access tokens have a limited lifespan (typically 1 hour)</li>
+							<li>Refresh tokens can be used to obtain new access tokens</li>
+							<li>
+								Tokens contain encoded user information for stateless
+								authentication
+							</li>
+						</ul>
+					</section>
+
+					<section id="graphql-endpoint">
+						<h2>GraphQL Endpoint</h2>
+						<p>
+							All GraphQL operations are performed through a single endpoint:
+						</p>
+
+						<div class="code-block">
+							<div class="code-block-header">
+								<span>API Endpoint</span>
+								<button class="copy-btn" data-id="api-endpoint">
+									<i class="fas fa-copy"></i> Copy
+								</button>
+								<span id="copy-success-api-endpoint" class="copy-success"
+									>Copied!</span
+								>
+							</div>
+							<div class="code-block-content">
+								<pre><code>POST /api</code></pre>
+							</div>
+						</div>
+
+						<p>
+							The API uses Apollo Server middleware to process GraphQL requests.
+							All queries and mutations should be sent to this endpoint using
+							the POST method with a JSON payload.
+						</p>
+
+						<div class="note-box">
+							<p>
+								<strong>Important:</strong> All GraphQL operations must use POST
+								requests. GET requests to the endpoint will return information
+								about the API but will not process GraphQL operations.
+							</p>
+						</div>
+
+						<h3>Request Format</h3>
+						<p>GraphQL requests should be formatted as follows:</p>
+
+						<div class="code-block">
+							<div class="code-block-header">
+								<span>Request Format</span>
+								<button class="copy-btn" data-id="request-format">
+									<i class="fas fa-copy"></i> Copy
+								</button>
+								<span id="copy-success-request-format" class="copy-success"
+									>Copied!</span
+								>
+							</div>
+							<div class="code-block-content">
+								<pre><code>{
+  <span class="code-string">"query"</span>: <span class="code-string">"query { ... }"</span> <span class="code-comment">// or "mutation { ... }"</span>
+  <span class="code-string">"variables"</span>: { } <span class="code-comment">// optional variables object</span>
+}</code></pre>
+							</div>
+						</div>
+					</section>
+
+					<section id="queries">
+						<h2>Queries</h2>
+						<p>The API provides the following query operations:</p>
+
+						<div class="api-endpoint">
+							<h3><i class="fas fa-search"></i> verifyToken</h3>
+							<p>
+								Verifies the validity of a JWT token and returns the associated
+								user information.
+							</p>
+
+							<div class="code-block">
+								<div class="code-block-header">
+									<span>Query Example</span>
+									<button class="copy-btn" data-id="verify-token">
+										<i class="fas fa-copy"></i> Copy
+									</button>
+									<span id="copy-success-verify-token" class="copy-success"
+										>Copied!</span
+									>
+								</div>
+								<div class="code-block-content">
+									<pre><code><span class="code-tag">query</span> {
+  <span class="code-function">verifyToken</span>(token: <span class="code-string">"your-jwt-token"</span>) {
+    id
+    email
+  }
+}</code></pre>
+								</div>
+							</div>
+
+							<h4>Parameters</h4>
+							<table class="parameter-table">
+								<thead>
+									<tr>
+										<th>Parameter</th>
+										<th>Type</th>
+										<th>Description</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>token</td>
+										<td>String!</td>
+										<td>JWT token to verify</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="api-endpoint">
+							<h3><i class="fas fa-sync-alt"></i> generateRefreshToken</h3>
+							<p>Generates a new refresh token from an existing token.</p>
+
+							<div class="code-block">
+								<div class="code-block-header">
+									<span>Query Example</span>
+									<button class="copy-btn" data-id="refresh-token">
+										<i class="fas fa-copy"></i> Copy
+									</button>
+									<span id="copy-success-refresh-token" class="copy-success"
+										>Copied!</span
+									>
+								</div>
+								<div class="code-block-content">
+									<pre><code><span class="code-tag">query</span> {
+  <span class="code-function">generateRefreshToken</span>(token: <span class="code-string">"your-jwt-token"</span>)
+}</code></pre>
+								</div>
+							</div>
+
+							<h4>Parameters</h4>
+							<table class="parameter-table">
+								<thead>
+									<tr>
+										<th>Parameter</th>
+										<th>Type</th>
+										<th>Description</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>token</td>
+										<td>String!</td>
+										<td>Existing JWT token</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="api-endpoint">
+							<h3><i class="fas fa-key"></i> generateToken</h3>
+							<p>Generates a new JWT token.</p>
+
+							<div class="code-block">
+								<div class="code-block-header">
+									<span>Query Example</span>
+									<button class="copy-btn" data-id="generate-token">
+										<i class="fas fa-copy"></i> Copy
+									</button>
+									<span id="copy-success-generate-token" class="copy-success"
+										>Copied!</span
+									>
+								</div>
+								<div class="code-block-content">
+									<pre><code><span class="code-tag">query</span> {
+  <span class="code-function">generateToken</span>
+}</code></pre>
+								</div>
+							</div>
+						</div>
+
+						<div class="api-endpoint">
+							<h3><i class="fas fa-comment"></i> sayHello</h3>
+							<p>A simple test endpoint to verify API connectivity.</p>
+
+							<div class="code-block">
+								<div class="code-block-header">
+									<span>Query Example</span>
+									<button class="copy-btn" data-id="say-hello">
+										<i class="fas fa-copy"></i> Copy
+									</button>
+									<span id="copy-success-say-hello" class="copy-success"
+										>Copied!</span
+									>
+								</div>
+								<div class="code-block-content">
+									<pre><code><span class="code-tag">query</span> {
+  <span class="code-function">sayHello</span> {
+    message
+    status
+  }
+}</code></pre>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					<section id="mutations">
+						<h2>Mutations</h2>
+						<p>The API provides the following mutation operations:</p>
+
+						<div class="api-endpoint">
+							<h3><i class="fas fa-user-plus"></i> signUp</h3>
+							<p>Registers a new user and returns authentication tokens.</p>
+
+							<div class="code-block">
+								<div class="code-block-header">
+									<span>Mutation Example</span>
+									<button class="copy-btn" data-id="sign-up">
+										<i class="fas fa-copy"></i> Copy
+									</button>
+									<span id="copy-success-sign-up" class="copy-success"
+										>Copied!</span
+									>
+								</div>
+								<div class="code-block-content">
+									<pre><code><span class="code-tag">mutation</span> {
+  <span class="code-function">signUp</span>(
+    email: <span class="code-string">"user@example.com"</span>, 
+    password: <span class="code-string">"secure-password"</span>
+  ) {
+    access_token
+    refresh_token
+    message
+    status
+    error
+  }
+}</code></pre>
+								</div>
+							</div>
+
+							<h4>Parameters</h4>
+							<table class="parameter-table">
+								<thead>
+									<tr>
+										<th>Parameter</th>
+										<th>Type</th>
+										<th>Description</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>email</td>
+										<td>String!</td>
+										<td>User's email address</td>
+									</tr>
+									<tr>
+										<td>password</td>
+										<td>String!</td>
+										<td>User's password (min 8 characters)</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="api-endpoint">
+							<h3><i class="fas fa-sign-in-alt"></i> signIn</h3>
+							<p>
+								Authenticates an existing user and returns authentication
+								tokens.
+							</p>
+
+							<div class="code-block">
+								<div class="code-block-header">
+									<span>Mutation Example</span>
+									<button class="copy-btn" data-id="sign-in">
+										<i class="fas fa-copy"></i> Copy
+									</button>
+									<span id="copy-success-sign-in" class="copy-success"
+										>Copied!</span
+									>
+								</div>
+								<div class="code-block-content">
+									<pre><code><span class="code-tag">mutation</span> {
+  <span class="code-function">signIn</span>(
+    email: <span class="code-string">"user@example.com"</span>, 
+    password: <span class="code-string">"secure-password"</span>
+  ) {
+    access_token
+    refresh_token
+    message
+    status
+    error
+  }
+}</code></pre>
+								</div>
+							</div>
+
+							<h4>Parameters</h4>
+							<table class="parameter-table">
+								<thead>
+									<tr>
+										<th>Parameter</th>
+										<th>Type</th>
+										<th>Description</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>email</td>
+										<td>String!</td>
+										<td>User's email address</td>
+									</tr>
+									<tr>
+										<td>password</td>
+										<td>String!</td>
+										<td>User's password</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="api-endpoint">
+							<h3><i class="fas fa-user-edit"></i> updateUser</h3>
+							<p>Updates user information for an authenticated user.</p>
+
+							<div class="code-block">
+								<div class="code-block-header">
+									<span>Mutation Example</span>
+									<button class="copy-btn" data-id="update-user">
+										<i class="fas fa-copy"></i> Copy
+									</button>
+									<span id="copy-success-update-user" class="copy-success"
+										>Copied!</span
+									>
+								</div>
+								<div class="code-block-content">
+									<pre><code><span class="code-tag">mutation</span> {
+  <span class="code-function">updateUser</span>(
+    user_id: <span class="code-string">"user-id"</span>,
+    token: <span class="code-string">"jwt-token"</span>,
+    updated_data: {
+      email: <span class="code-string">"new-email@example.com"</span>,
+      password: <span class="code-string">"new-password"</span>
+    }
+  ) {
+    message
+    status
+    error
+  }
+}</code></pre>
+								</div>
+							</div>
+
+							<h4>Parameters</h4>
+							<table class="parameter-table">
+								<thead>
+									<tr>
+										<th>Parameter</th>
+										<th>Type</th>
+										<th>Description</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>user_id</td>
+										<td>String!</td>
+										<td>ID of the user to update</td>
+									</tr>
+									<tr>
+										<td>token</td>
+										<td>String!</td>
+										<td>JWT token for authentication</td>
+									</tr>
+									<tr>
+										<td>updated_data</td>
+										<td>Object!</td>
+										<td>Object containing fields to update</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<div class="api-endpoint">
+							<h3><i class="fas fa-user-times"></i> deleteUser</h3>
+							<p>Removes a user account.</p>
+
+							<div class="code-block">
+								<div class="code-block-header">
+									<span>Mutation Example</span>
+									<button class="copy-btn" data-id="delete-user">
+										<i class="fas fa-copy"></i> Copy
+									</button>
+									<span id="copy-success-delete-user" class="copy-success"
+										>Copied!</span
+									>
+								</div>
+								<div class="code-block-content">
+									<pre><code><span class="code-tag">mutation</span> {
+  <span class="code-function">deleteUser</span>(
+    user_id: <span class="code-string">"user-id"</span>,
+    token: <span class="code-string">"jwt-token"</span>
+  )
+}</code></pre>
+								</div>
+							</div>
+
+							<h4>Parameters</h4>
+							<table class="parameter-table">
+								<thead>
+									<tr>
+										<th>Parameter</th>
+										<th>Type</th>
+										<th>Description</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>user_id</td>
+										<td>String!</td>
+										<td>ID of the user to delete</td>
+									</tr>
+									<tr>
+										<td>token</td>
+										<td>String!</td>
+										<td>JWT token for authentication</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</section>
+
+					<section id="error-handling">
+						<h2>Error Handling</h2>
+						<p>
+							The API returns standardized error responses with appropriate HTTP
+							status codes and descriptive messages to help troubleshoot issues.
+						</p>
+
+						<h3>Common Error Types</h3>
+						<p>Authentication errors typically include:</p>
+						<ul>
+							<li>Missing or invalid client ID</li>
+							<li>Invalid or expired tokens</li>
+							<li>Insufficient permissions</li>
+							<li>Malformed GraphQL queries</li>
+							<li>Validation errors in input data</li>
+						</ul>
+
+						<h3>Error Response Format</h3>
+						<p>Error responses follow this structure:</p>
+
+						<div class="code-block">
+							<div class="code-block-header">
+								<span>Error Response Format</span>
+								<button class="copy-btn" data-id="error-response">
+									<i class="fas fa-copy"></i> Copy
+								</button>
+								<span id="copy-success-error-response" class="copy-success"
+									>Copied!</span
+								>
+							</div>
+							<div class="code-block-content">
+								<pre><code>{
+  <span class="code-string">"errors"</span>: [
+    {
+      <span class="code-string">"message"</span>: <span class="code-string">"Error description"</span>,
+      <span class="code-string">"extensions"</span>: {
+        <span class="code-string">"code"</span>: <span class="code-string">"ERROR_CODE"</span>,
+        <span class="code-string">"status"</span>: 400
+      }
+    }
+  ]
+}</code></pre>
+							</div>
+						</div>
+
+						<div class="note-box">
+							<p>
+								<strong>Note:</strong> Always check the status and error fields
+								in your response to handle errors gracefully in your
+								application.
+							</p>
+						</div>
+					</section>
+				</div>
+			</div>
+		</section>
+
+		<footer>
+			<div class="container">
+				<div class="footer-content">
+					<div class="footer-logo">
+						<i class="fas fa-database"></i>
+						<h2>GraphQL Auth API</h2>
+					</div>
+					<div class="footer-links">
+						<h3>Resources</h3>
+						<ul>
+							<li><a href="/api-documentation">API Documentation</a></li>
+							<li><a href="/api">API Endpoint</a></li>
+							<li><a href="#">Contact Support</a></li>
+						</ul>
+					</div>
+					<div class="footer-links">
+						<h3>Quick Links</h3>
+						<ul>
+							<li><a href="/#features">Features</a></li>
+							<li><a href="#authentication">Authentication</a></li>
+							<li><a href="#queries">Queries</a></li>
+							<li><a href="#mutations">Mutations</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="copyright">
+					<p>&copy; 2025 GraphQL Auth API. All rights reserved.</p>
+				</div>
+			</div>
+		</footer>
+
+		<script>
+			// Store all code examples in a central object
+			const codeExamples = {
+				'client-id-header': 'client_id: YOUR_CLIENT_ID',
+				'auth-header': 'Authorization: Bearer YOUR_JWT_TOKEN',
+				'api-endpoint': 'POST /api',
+				'request-format':
+					'{\n  "query": "query { ... }" // or "mutation { ... }"\n  "variables": { } // optional variables object\n}',
+				'verify-token':
+					'query {\n  verifyToken(token: "your-jwt-token") {\n    id\n    email\n  }\n}',
+				'refresh-token':
+					'query {\n  generateRefreshToken(token: "your-jwt-token")\n}',
+				'generate-token': 'query {\n  generateToken\n}',
+				'say-hello': 'query {\n  sayHello {\n    message\n    status\n  }\n}',
+				'sign-up':
+					'mutation {\n  signUp(email: "user@example.com", password: "secure-password") {\n    access_token\n    refresh_token\n    message\n    status\n    error\n  }\n}',
+				'sign-in':
+					'mutation {\n  signIn(email: "user@example.com", password: "secure-password") {\n    access_token\n    refresh_token\n    message\n    status\n    error\n  }\n}',
+				'update-user':
+					'mutation {\n  updateUser(\n    user_id: "user-id",\n    token: "jwt-token",\n    updated_data: {\n      email: "new-email@example.com",\n      password: "new-password"\n    }\n  ) {\n    message\n    status\n    error\n  }\n}',
+				'delete-user':
+					'mutation {\n  deleteUser(\n    user_id: "user-id",\n    token: "jwt-token"\n  )\n}',
+				'error-response':
+					'{\n  "errors": [\n    {\n      "message": "Error description",\n      "extensions": {\n        "code": "ERROR_CODE",\n        "status": 400\n      }\n    }\n  ]\n}',
+			};
+
+			// Function to copy text to clipboard
+			function copyToClipboard(text, elementId) {
+				navigator.clipboard.writeText(text);
+				const successElement = document.getElementById(elementId);
+				if (successElement) {
+					successElement.classList.add('show-success');
+					setTimeout(() => {
+						successElement.classList.remove('show-success');
+					}, 2000);
+				}
+			}
+
+			// Attach event listeners to copy buttons
+			document.addEventListener('DOMContentLoaded', function () {
+				// Handle copy buttons
+				document.querySelectorAll('.copy-btn').forEach((button) => {
+					button.addEventListener('click', function () {
+						const id = this.getAttribute('data-id');
+						const text = codeExamples[id];
+						if (text) {
+							copyToClipboard(text, `copy-success-${id}`);
+						}
+					});
+				});
+
+				// Smooth scrolling for sidebar links
+				const sidebarLinks = document.querySelectorAll('.docs-sidebar a');
+
+				sidebarLinks.forEach((link) => {
+					link.addEventListener('click', function (e) {
+						e.preventDefault();
+
+						const targetId = this.getAttribute('href');
+						const targetElement = document.querySelector(targetId);
+
+						window.scrollTo({
+							top: targetElement.offsetTop - 100,
+							behavior: 'smooth',
+						});
+
+						// Update URL without refreshing page
+						history.pushState(null, null, targetId);
+
+						// Set active class on clicked link
+						sidebarLinks.forEach((link) => link.classList.remove('active'));
+						this.classList.add('active');
+					});
+				});
+
+				// Set active class based on current hash
+				const hash = window.location.hash;
+				if (hash) {
+					const activeLink = document.querySelector(
+						`.docs-sidebar a[href="${hash}"]`
+					);
+					if (activeLink) {
+						activeLink.classList.add('active');
+					}
+				} else {
+					// Set first link as active by default
+					sidebarLinks[0].classList.add('active');
+				}
+
+				window.addEventListener('scroll', function () {
+					const sections = document.querySelectorAll('.docs-main section');
+					let currentSection = '';
+
+					sections.forEach((section) => {
+						const sectionTop = section.offsetTop;
+						const sectionHeight = section.clientHeight;
+
+						if (window.scrollY >= sectionTop - 150) {
+							currentSection = '#' + section.getAttribute('id');
+						}
+					});
+
+					if (currentSection) {
+						sidebarLinks.forEach((link) => {
+							link.classList.remove('active');
+							if (link.getAttribute('href') === currentSection) {
+								link.classList.add('active');
+							}
+						});
+					}
+				});
+			});
+		</script>
+	</body>
+</html>
