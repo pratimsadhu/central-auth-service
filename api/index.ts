@@ -8,6 +8,7 @@ import typeDefs from '../src/graphql/schema';
 import resolvers from '../src/graphql/resolvers';
 import pageRouter from '../src/routes/pageRoutes';
 import { authentication } from '../src/middleware/authMiddleware';
+import { rateLimit } from '../src/middleware/ratelimitMiddleware';
 
 declare global {
 	namespace Express {
@@ -40,16 +41,17 @@ const startApolloServer = async (
 	app.use('/api', (req, res, next) => {
 		// Only apply authentication middleware for non-GET requests
 		if (req.method !== 'GET') {
-			return authentication(req, res, next);
+			return rateLimit(req, res, () => authentication(req, res, next));
+		} else {
+			next();
 		}
-		next();
 	});
 	server.applyMiddleware({ app: app as any, path: '/api' });
 
 	// Use 404 handler for all other routes
 	app.use((req, res) => {
 		res.status(404).sendFile(path.join(__dirname, '../src/public/404.html'));
-	  });
+	});
 };
 
 startApolloServer(app, httpServer);
