@@ -1,3 +1,4 @@
+import redis from '../config/redis';
 import clientService from '../services/client';
 import { Response, NextFunction } from 'express';
 
@@ -24,6 +25,14 @@ export const authentication = async (
 			return;
 		}
 
+		// Check if client ID is cached
+		const cachedClient = await redis.get(`client:${clientId}`);
+		if (cachedClient) {
+			req.client_id = clientId;
+			next();
+		}
+
+		// Client ID is not cached
 		const clientVerification = await clientService.verifyClient(clientId);
 		if (clientVerification.error) {
 			res.status(clientVerification.status).json(clientVerification);
@@ -38,6 +47,10 @@ export const authentication = async (
 			});
 			return;
 		}
+
+		// Cache client ID with 1 hour expiration
+		await redis.setex(`client:${clientId}`, 3600, 'verified');
+
 		req.client_id = clientId;
 		next();
 	} catch (err) {

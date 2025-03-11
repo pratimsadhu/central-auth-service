@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import http from 'http';
 import express from 'express';
@@ -8,6 +8,7 @@ import typeDefs from '../src/graphql/schema';
 import resolvers from '../src/graphql/resolvers';
 import pageRouter from '../src/routes/pageRoutes';
 import { authentication } from '../src/middleware/authMiddleware';
+import { rateLimit } from '../src/middleware/ratelimitMiddleware';
 
 declare global {
 	namespace Express {
@@ -37,19 +38,26 @@ const startApolloServer = async (
 	});
 
 	await server.start();
-	app.use('/api', (req, res, next) => {
+	app.use('/api', async (req, res, next) => {
 		// Only apply authentication middleware for non-GET requests
 		if (req.method !== 'GET') {
-			return authentication(req, res, next);
+			await rateLimit(req, res, async (error) => {
+				if (error || res.headersSent) return;
+				await authentication(req, res, (authErr) => {
+					if (authErr || res.headersSent) return;
+					next();
+				});
+			});
+		} else {
+			next();
 		}
-		next();
 	});
 	server.applyMiddleware({ app: app as any, path: '/api' });
 
 	// Use 404 handler for all other routes
 	app.use((req, res) => {
 		res.status(404).sendFile(path.join(__dirname, '../src/public/404.html'));
-	  });
+	});
 };
 
 startApolloServer(app, httpServer);
