@@ -1,4 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core';
 import http from 'http';
 import express from 'express';
@@ -38,10 +38,16 @@ const startApolloServer = async (
 	});
 
 	await server.start();
-	app.use('/api', (req, res, next) => {
+	app.use('/api', async (req, res, next) => {
 		// Only apply authentication middleware for non-GET requests
 		if (req.method !== 'GET') {
-			return rateLimit(req, res, () => authentication(req, res, next));
+			await rateLimit(req, res, async (error) => {
+				if (error || res.headersSent) return;
+				await authentication(req, res, (authErr) => {
+					if (authErr || res.headersSent) return;
+					next();
+				});
+			});
 		} else {
 			next();
 		}
