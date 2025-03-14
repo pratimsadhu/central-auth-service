@@ -25,6 +25,9 @@ jobs:
 
       - name: Run Tests
         run: yarn test
+        env:
+          JWT_PRIVATE_KEY: ${{ secrets.JWT_PRIVATE_KEY }}
+          JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY }}
 
       - name: Check Test Coverage
         run: yarn test --coverage
