@@ -26,11 +26,11 @@ export const authentication = async (
 		}
 
 		// Check if client ID is cached
-		const cachedClient = await redis.get(`client:${clientId}`);
-		if (cachedClient) {
-			req.client_id = clientId;
-			next();
-		}
+		// const cachedClient = await redis.get(`client:${clientId}`);
+		// if (cachedClient) {
+		// 	req.client_id = clientId;
+		// 	next();
+		// }
 
 		// Client ID is not cached
 		const clientVerification = await clientService.verifyClient(clientId);
@@ -49,7 +49,7 @@ export const authentication = async (
 		}
 
 		// Cache client ID with 1 hour expiration
-		await redis.setex(`client:${clientId}`, 3600, 'verified');
+		// await redis.setex(`client:${clientId}`, 3600, 'verified');
 
 		req.client_id = clientId;
 		next();
