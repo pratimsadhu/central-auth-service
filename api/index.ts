@@ -38,20 +38,28 @@ const startApolloServer = async (
 	});
 
 	await server.start();
-	app.use('/api', async (req, res, next) => {
+	// app.use('/api', async (req, res, next) => {
+	// 	// Only apply authentication middleware for non-GET requests
+	// 	if (req.method !== 'GET') {
+	// 		await rateLimit(req, res, async (error) => {
+	// 			if (error || res.headersSent) return;
+	// 			await authentication(req, res, (authErr) => {
+	// 				if (authErr || res.headersSent) return;
+	// 				next();
+	// 			});
+	// 		});
+	// 	} else {
+	// 		next();
+	// 	}
+	// });
+	app.use('/api', (req, res, next) => {
 		// Only apply authentication middleware for non-GET requests
 		if (req.method !== 'GET') {
-			await rateLimit(req, res, async (error) => {
-				if (error || res.headersSent) return;
-				await authentication(req, res, (authErr) => {
-					if (authErr || res.headersSent) return;
-					next();
-				});
-			});
-		} else {
-			next();
+			return authentication(req, res, next);
 		}
+		next();
 	});
+	server.applyMiddleware({ app: app as any, path: '/api' });
 	server.applyMiddleware({ app: app as any, path: '/api' });
 
 	// Use 404 handler for all other routes
