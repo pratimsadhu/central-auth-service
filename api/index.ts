@@ -60,7 +60,6 @@ const startApolloServer = async (
 		next();
 	});
 	server.applyMiddleware({ app: app as any, path: '/api' });
-	server.applyMiddleware({ app: app as any, path: '/api' });
 
 	// Use 404 handler for all other routes
 	app.use((req, res) => {
